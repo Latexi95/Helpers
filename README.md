@@ -1,1 +1,2 @@
-# Helpers
+# Utility class/function collection
+
