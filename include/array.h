@@ -2,6 +2,8 @@
 #define ARRAY
 #include <initializer_list>
 #include <cassert>
+#include <algorithm>
+
 namespace ArrayInternal {
 	template <std::size_t FD, std::size_t... D>
 	struct Multiplicate {
@@ -77,20 +79,25 @@ class Array {
 		typedef const T *const_iterator;
 
 		Array() {}
+		Array(const Array &array) { std::copy(array.begin(), array.end(), begin()); }
 		Array(const typename ArrayInternal::InitializerHelper<T, FD, D...>::Type &init) {
-			ArrayInternal::InitializerHelper<T, FD, D...>::initialize(data, init);
+			ArrayInternal::InitializerHelper<T, FD, D...>::initialize(dataArray, init);
 		}
 
 		static const std::size_t ElementCount = ArrayInternal::Multiplicate<FD, D...>::Result;
 		typename ArrayInternal::SubscriptHelper<T, FD, D...>::Result operator [](std::size_t i) { return ArrayInternal::SubscriptHelper<T, FD, D...>(dataArray)[i];}
 		typename ArrayInternal::SubscriptHelper<const T, FD, D...>::Result operator [](std::size_t i) const { return ArrayInternal::SubscriptHelper<const T, FD, D...>(dataArray)[i];}
 
-		iterator *begin() { return data; }
-		iterator *end() { return data + ElementCount; }
+		Array &operator=(const Array &array) { std::copy(array.begin(), array.end(), begin()); }
+		bool operator==(const Array &array) const { return std::equal(array.begin(), array.end(), begin()); }
+		bool operator!=(const Array &array) const { return !std::equal(array.begin(), array.end(), begin()); }
+
+		iterator begin() { return dataArray; }
+		iterator end() { return dataArray + ElementCount; }
 		const_iterator begin() const { return cbegin(); }
 		const_iterator end() const { return cend(); }
-		const_iterator cbegin() const { return data; }
-		const_iterator cend() const { return data + ElementCount; }
+		const_iterator cbegin() const { return dataArray; }
+		const_iterator cend() const { return dataArray + ElementCount; }
 
 		T *data() { return dataArray; }
 		const T *data() const { return dataArray; }
