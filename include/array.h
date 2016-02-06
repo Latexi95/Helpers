@@ -1,5 +1,4 @@
-#ifndef ARRAY
-#define ARRAY
+#pragma once
 #include <initializer_list>
 #include <cassert>
 #include <algorithm>
@@ -116,6 +115,4 @@ class Array {
 		T dataArray[ElementCount];
 };
 
-
-#endif // ARRAY
 
