@@ -1,8 +1,11 @@
-#ifndef MD_VECTOR_H
-#define MD_VECTOR_H
+#ifndef UTILITY_MD_VECTOR_H
+#define UTILITY_MD_VECTOR_H
+
 #include <initializer_list>
 #include <vector>
 #include <array>
+
+namespace utility {
 
 enum class md_vector_order {
     row_major,
@@ -112,7 +115,7 @@ struct access_helper_column_major {
 
     result_type operator[](std::size_t idx) {
         std::size_t mult = 1;
-        for (std::size_t i = INDEX; i < DIM_COUNT - 1; ++i) {
+        for (std::size_t i = 0; i < DIM_COUNT - INDEX - 1; ++i) {
             mult *= dims_[i];
         }
         return result_type(dims_, data_, offset_ + mult * idx);
@@ -228,6 +231,9 @@ protected:
 };
 }
 
+/** Multi-dimensional vector class
+*/
+
 template <typename T, std::size_t DIM_COUNT, md_vector_order ORDER = md_vector_order::row_major>
 class md_vector : public md_vector_base<T, DIM_COUNT, ORDER> {
 public:
@@ -244,8 +250,17 @@ public:
     typedef T value_type;
     typedef typename std::vector<T>::difference_type difference_type;
 
+    md_vector() = default;
+    md_vector(const md_vector &vec) = default;
+    md_vector(const std::array<std::size_t, DIM_COUNT> &sizes) {
+      resize_fill(sizes, T());
+    }
+    md_vector(const std::array<std::size_t, DIM_COUNT> &sizes, const T &v) {
+      resize_fill(sizes, v);
+    }
+
     std::size_t size() const { return this->data_.size(); }
-    std::size_t size(std::size_t dim_idx) const { return this->dimensions_[dim_idx]; }
+    std::size_t dim(std::size_t dim_idx) const { return this->dimensions_[dim_idx]; }
 
     void fill(const T &v) {
         for (T &d : this->data_) {
@@ -302,4 +317,6 @@ public:
     }
 };
 
-#endif // MD_VECTOR_H
+}  // namespace utility
+
+#endif // UTILITY_MD_VECTOR_H
